@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const twilio = require('twilio');
-const generateToken = require('../utils/jwt');  
+const generateToken = require('../utils/jwt');
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -9,15 +9,17 @@ const twilioClient = twilio(ACCOUNT_SID, AUTH_TOKEN);
 
 const register = async (req, res) => {
   const { phoneNumber } = req.body;
+  const number = phoneNumber.trim()
 
   try {
     // send OTP using Twilio
+
     const verification = await twilioClient.verify.v2
       .services(SERVICE_SID)
-      .verifications.create({ to: phoneNumber, channel: 'sms' });
+      .verifications.create({ to: number, channel: 'sms' });
 
     res.status(200).json({
-      message: `OTP sent to ${phoneNumber}`,
+      message: `OTP sent to ${number}`,
       status: verification.status,
     });
   } catch (error) {
@@ -28,7 +30,7 @@ const register = async (req, res) => {
   }
 };
 
-console.log('Twilio Service SID:', SERVICE_SID);
+// console.log('Twilio Service SID:', SERVICE_SID);
 
 
 
@@ -51,7 +53,7 @@ const verifyOtp = async (req, res) => {
         await user.save();
       }
 
-      const token = generateToken(user._id); 
+      const token = generateToken(user._id);
 
       await twilioClient.messages.create({
         body: 'Your phone number has been verified successfully',
