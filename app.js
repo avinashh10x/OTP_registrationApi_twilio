@@ -1,4 +1,5 @@
 require('dotenv').config();
+const axios = require("axios");
 const express = require('express');
 const connectDB = require('./utils/db');
 const authRoutes = require('./routes/authRoutes');
@@ -15,6 +16,11 @@ app.use(cors({
 }));
 
 app.use('/api/auth', authRoutes);
+
+(async () => {
+  const res = await axios.get("https://api.ipify.org?format=json");
+  console.log("Public IP Address:", res.data.ip);
+})();
 
 
 app.get('/', async (req, res) => {
